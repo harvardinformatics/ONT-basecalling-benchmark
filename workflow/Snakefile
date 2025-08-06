@@ -20,9 +20,9 @@ def get_reads(wildcards):
 #Fxn to handle fastq vs fasta as input
 def choose_path(wildcards):
     if wildcards.precorr == "herro":
-        passFile = f"{wildcards.sample}_{wildcards.model}_{wildcards.precorr}.fasta"
+        passFile = f"../results/{wildcards.sample}_{wildcards.model}_{wildcards.precorr}.fasta"
     else:
-        passFile = f"{wildcards.sample}_{wildcards.model}_{wildcards.precorr}.fastq"
+        passFile = f"../results/{wildcards.sample}_{wildcards.model}_{wildcards.precorr}.fastq"
     return passFile
 
 #WIP: Change this to the relevant target files 
