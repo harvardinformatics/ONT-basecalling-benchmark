@@ -1,0 +1,94 @@
+#DEK
+import yaml
+import glob, os, pathlib
+
+#Config file
+configfile: "../config/config.yaml"
+
+#Naming format: {sampleID.chemistry}_{basecall_model}_{precorr_method}
+
+samples = config["samples"]
+models=["sup","hac"]
+#models = config["models"]
+precorrs=["noCorr","herro"]
+#precorrs = config["precorrs"]
+
+#Fxn the get corresponding fast5 files for sample
+def get_reads(wildcards):
+    return config["samples"][wildcards.sample]
+
+#Fxn to handle fastq vs fasta as input
+def choose_path(wildcards):
+    if wildcards.precorr == "herro":
+        passFile = f"{wildcards.sample}_{wildcards.model}_{wildcards.precorr}.fasta"
+    else:
+        passFile = f"{wildcards.sample}_{wildcards.model}_{wildcards.precorr}.fastq"
+    return passFile
+
+#WIP: Change this to the relevant target files 
+rule all:
+    input:
+        expand("../results/{sample}_{model}_{precorr}.hist", sample=samples, model=models, precorr=precorrs),
+        expand("../results/{sample}_{model}_{precorr}.sorted.bam", sample=samples, model=models, precorr=precorrs)
+
+
+rule basecall:
+    input:
+        get_reads
+    output:
+        "../results/{sample}_{model}_noCorr.fastq"
+    params:
+        model="{model}"
+    log:
+        "logs/basecalling/{sample}_{model}.log"
+    shell:
+        "(dorado basecaller --emit-fastq {params.model} {input} > {output}) 2> {log}"
+
+rule herro_toPaf:
+    input:
+        "../results/{sample}_{model}_noCorr.fastq"
+    output:
+        "../results/{sample}_{model}_herro.paf"
+    log:
+        "logs/herro/{sample}_{model}_toPaf.log"
+    shell:
+        "(dorado correct {input} --to-paf > {output}) 2> {log}"
+
+rule herro_correct:
+    input:
+        paf = "../results/{sample}_{model}_herro.paf",
+        reads = "../results/{sample}_{model}_noCorr.fastq"
+    output:
+        "../results/{sample}_{model}_herro.fasta"
+    log:
+        "logs/herro/{sample}_{model}_correct.log"
+    shell:
+        "(dorado correct {input.reads} --from-paf {input.paf} > {output}) 2> {log}"
+
+rule map_reads:
+    input:
+        query = choose_path,
+        ref = config["ref_genome"]
+    output:
+        "../results/{sample}_{model}_{precorr}.sorted.bam"
+    log:
+        "logs/minimap/{sample}_{model}_{precorr}.log"
+    conda:
+        "envs/map_reads.yaml"
+    shell:
+        "(minimap2 -ax map-ont {input.ref} {input.query} | samtools sort --write-index -Sb - > {output}) 2> {log}"
+
+rule count_kmers:
+    input:
+        choose_path
+    output:
+        "../results/{sample}_{model}_{precorr}.hist"
+    log:
+        "logs/kmerKAT/{sample}_{model}_{precorr}.log"
+    conda:
+        "envs/kat.yaml"
+    params:
+        outPrefix = "{sample}_{model}_{precorr}"
+    shell:
+        "kat hist -o {params.outPrefix} {input}"
+

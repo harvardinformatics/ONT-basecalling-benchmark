@@ -1,0 +1,10 @@
+
+samples:
+  sampleA: ["path/to/fast5"]
+  sampleB: ["path/to/fast5"]
+
+models: ["sup", "hac"]
+
+precorrs: [["noCorr","herro","dechat"]]
+
+ref_genome: "/path/to/ref.fa"
