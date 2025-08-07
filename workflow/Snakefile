@@ -41,11 +41,12 @@ rule basecall:
     output:
         "../results/{sample}_{model}_noCorr.fastq"
     params:
-        model="{model}"
+        model="{model}",
+        dorado = config["dorado_path"]
     log:
         "logs/basecalling/{sample}_{model}.log"
     shell:
-        "(dorado basecaller --emit-fastq {params.model} {input} > {output}) 2> {log}"
+        "({params.dorado} basecaller --emit-fastq {params.model} {input} > {output}) 2> {log}"
 
 rule herro_toPaf:
     input:
@@ -54,8 +55,10 @@ rule herro_toPaf:
         "../results/{sample}_{model}_herro.paf"
     log:
         "logs/herro/{sample}_{model}_toPaf.log"
+    params:
+        dorado = config["dorado_path"]
     shell:
-        "(dorado correct {input} --to-paf > {output}) 2> {log}"
+        "({params.dorado} correct {input} --to-paf > {output}) 2> {log}"
 
 rule herro_correct:
     input:
@@ -65,8 +68,10 @@ rule herro_correct:
         "../results/{sample}_{model}_herro.fasta"
     log:
         "logs/herro/{sample}_{model}_correct.log"
+    params:
+        dorado = config["dorado_path"]
     shell:
-        "(dorado correct {input.reads} --from-paf {input.paf} > {output}) 2> {log}"
+        "({params.dorado} correct {input.reads} --from-paf {input.paf} > {output}) 2> {log}"
 
 rule dechat_correct:
     input:
@@ -80,7 +85,7 @@ rule dechat_correct:
     params:
         prefix = "../results/{sample}_{model}_dechat"
     shell:
-        "dechat -i {input} -o {params.prefix}"
+        "(dechat -i {input} -o {params.prefix}) 2> {log}"
 
 rule map_reads:
     input:

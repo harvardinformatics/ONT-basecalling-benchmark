@@ -8,3 +8,5 @@ models: ["sup", "hac"]
 precorrs: ["noCorr","herro","dechat"]
 
 ref_genome: "../testing/ref.fa"
+
+dorado_path: "../testing/dorado"
