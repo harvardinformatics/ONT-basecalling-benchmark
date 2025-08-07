@@ -29,7 +29,8 @@ def choose_path(wildcards):
 rule all:
     input:
         expand("../results/{sample}_{model}_{precorr}.hist", sample=samples, model=models, precorr=precorrs),
-        expand("../results/{sample}_{model}_{precorr}.sorted.bam", sample=samples, model=models, precorr=precorrs)
+        expand("../results/{sample}_{model}_{precorr}_errorCatalog", sample=samples, model=models, precorr=precorrs),
+        expand("../results/{sample}_{model}_noCorr_nanoplot", sample=samples, model=models)
 
 
 rule basecall:
@@ -78,6 +79,20 @@ rule map_reads:
     shell:
         "(minimap2 -ax map-ont {input.ref} {input.query} | samtools sort --write-index -Sb - > {output}) 2> {log}"
 
+rule bam_errors:
+    input: 
+        "../results/{sample}_{model}_{precorr}.sorted.bam"
+    output:
+        "../results/{sample}_{model}_{precorr}_errorCatalog" #check what kind output?
+    log:
+        "logs/bam_errors/{sample}_{model}_{precorr}.log"
+    conda:
+        "envs/pomoxis.yaml"
+    params:
+        prefix = "../results/{sample}_{model}_{precorr}_errorCatalog"
+    shell:
+        "(catalogue_errors -o {params.prefix} {input}) 2> {log}"
+
 rule count_kmers:
     input:
         choose_path
@@ -88,7 +103,20 @@ rule count_kmers:
     conda:
         "envs/kat.yaml"
     params:
-        outPrefix = "{sample}_{model}_{precorr}"
+        prefix = "{sample}_{model}_{precorr}"
     shell:
-        "kat hist -o {params.outPrefix} {input}"
+        "(kat hist -o {params.prefix} {input}) 2> {log}"
 
+rule nanoplot:
+    input:
+        "../results/{sample}_{model}_noCorr.fastq"
+    output:
+        "../results/{sample}_{model}_noCorr_nanoplot"
+    log:
+        "logs/nanoplot/{sample}_{model}_noCorr.log"
+    conda:
+        "envs/nanoplot.yaml"
+    params:
+        prefix = "../results/{sample}_{model}_noCorr_nanoplot"
+    shell:
+        "(NanoPlot -o {params.prefix} {input}) 2> {log}"

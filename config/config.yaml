@@ -1,10 +1,10 @@
 
 samples:
-  sampleA: ["path/to/fast5"]
-  sampleB: ["path/to/fast5"]
+  sampleA: ["../testing/sampleA/"]
+  sampleB: ["../testing/sampleB/"]
 
 models: ["sup", "hac"]
 
-precorrs: [["noCorr","herro","dechat"]]
+precorrs: ["noCorr","herro","dechat"]
 
-ref_genome: "/path/to/ref.fa"
+ref_genome: "../testing/ref.fa"

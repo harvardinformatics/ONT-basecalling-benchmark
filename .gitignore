@@ -22,6 +22,12 @@
 *.fastq
 *.fastq.gz
 *.fast5
+*.fasta
+*.pkl
+
+testing/*
+results/*
+.snakemake/*
 
 # Logs and databases #
 ######################
