@@ -10,7 +10,7 @@ configfile: "../config/config.yaml"
 samples = config["samples"]
 models=["sup","hac"]
 #models = config["models"]
-precorrs=["noCorr","herro"]
+precorrs=["noCorr","herro", "dechat"]
 #precorrs = config["precorrs"]
 
 #Fxn the get corresponding fast5 files for sample
@@ -21,6 +21,8 @@ def get_reads(wildcards):
 def choose_path(wildcards):
     if wildcards.precorr == "herro":
         passFile = f"../results/{wildcards.sample}_{wildcards.model}_{wildcards.precorr}.fasta"
+    elif wildcards.precorr == "dechat":
+        passFile = f"../results/{wildcards.sample}_{wildcards.model}_{wildcards.precorr}.ec.fa"
     else:
         passFile = f"../results/{wildcards.sample}_{wildcards.model}_{wildcards.precorr}.fastq"
     return passFile
@@ -65,6 +67,20 @@ rule herro_correct:
         "logs/herro/{sample}_{model}_correct.log"
     shell:
         "(dorado correct {input.reads} --from-paf {input.paf} > {output}) 2> {log}"
+
+rule dechat_correct:
+    input:
+        "../results/{sample}_{model}_noCorr.fastq"
+    output:
+        "../results/{sample}_{model}_dechat.ec.fa"
+    log:
+        "logs/dechat/{sample}_{model}_correct.log"
+    conda:
+        "envs/dechat.yaml"
+    params:
+        prefix = "../results/{sample}_{model}_dechat"
+    shell:
+        "dechat -i {input} -o {params.prefix}"
 
 rule map_reads:
     input:
