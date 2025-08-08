@@ -6,50 +6,68 @@ default-resources:
   slurm_partition: 'shared'
 
 set-threads:
-  bam2fastq: 1
-  adapterfilt: 4
-  hifiasm: 20
-  gfatofasta: 1
-  renamecontigs: 1
-  quast: 4
+  basecall: 1
+  herro_toPaf: 16
+  herro_correct: 8
+  dechat_correct: 8
+  map_reads: 16
+  bam_errors: 4
+  count_kmers: 4
+  nanoplot: 4
 
 set-resources:
-  bam2fastq:
+  basecall:
     nodes: 1
     tasks: 1 
     cpus_per_task: 1
-    mem_mb: 36000
-    runtime: 4320
-    slurm_partition: "shared"
-  adapterfilt:
+    gres: "gpu:1"
+    mem_mb: 32000
+    runtime: '8h'
+    slurm_partition: "gpu_test"
+  herro_toPaf:
+    nodes: 1
+    tasks: 1
+    cpus_per_task: 16
+    mem_mb: 32000
+    runtime: '8h'
+    slurm_partition: "holy-cow"
+  herro_correct:
+    nodes: 1
+    tasks: 1
+    cpus_per_task: 8
+    mem_mb: 32000
+    runtime: '8h'
+    gres: "gpu:1"
+    slurm_partition: "gpu_test"
+  dechat_correct:
+    nodes: 1
+    tasks: 1
+    cpus_per_task: 8
+    mem_mb: 64000
+    runtime: '8h'
+    slurm_partition: "holy-cow"
+  map_reads:
+    nodes: 1
+    tasks: 1
+    cpus_per_task: 16
+    mem_mb: 64000
+    runtime: '8h'
+    slurm_partition: "holy-cow"
+  bam_errors:
     nodes: 1
     tasks: 1
     cpus_per_task: 4
-    mem_mb: 36000
-    runtime: 4320
+    mem_mb: 32000
+    runtime: '1h'
     slurm_partition: "shared"
-  hifiasm:
+  count_kmers:
     nodes: 1
     tasks: 1
-    cpus_per_task: 20
-    mem_mb: 400000
-    runtime: 20160
-    slurm_partition: "intermediate"
-  gfa_to_fasta:
-    nodes: 1
-    tasks: 1
-    cpus_per_task: 1
+    cpus_per_task: 4
     mem_mb: 16000
     runtime: 720
     slurm_partition: "shared"
-  rename_contigs:
-    nodes: 1
-    tasks: 1
-    cpus_per_task: 1
-    mem_mb: 8000
-    runtime: 720
-    slurm_partition: "shared"
-  quast:
+  nanoplot:
     nodes: 1
     tasks: 1
     cpus_per_task: 4
