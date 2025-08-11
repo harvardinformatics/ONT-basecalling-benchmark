@@ -11,6 +11,7 @@ set-threads:
   herro_correct: 8
   dechat_correct: 8
   map_reads: 16
+  sort_mappings: 4
   bam_errors: 4
   count_kmers: 4
   nanoplot: 4
@@ -51,6 +52,13 @@ set-resources:
     tasks: 1
     cpus_per_task: 16
     mem_mb: 64000
+    runtime: '8h'
+    slurm_partition: "holy-cow"
+  sort_mappings:
+    nodes: 1
+    tasks: 1
+    cpus_per_task: 4
+    mem_mb: 24000
     runtime: '8h'
     slurm_partition: "holy-cow"
   bam_errors:
