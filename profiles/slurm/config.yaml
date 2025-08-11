@@ -20,10 +20,10 @@ set-resources:
     nodes: 1
     tasks: 1 
     cpus_per_task: 1
-    gres: "gpu:1"
+    slurm_extra: "'--gres=gpu:1'"
     mem_mb: 32000
     runtime: '8h'
-    slurm_partition: "gpu_test"
+    slurm_partition: "gpu"
   herro_toPaf:
     nodes: 1
     tasks: 1
@@ -37,8 +37,8 @@ set-resources:
     cpus_per_task: 8
     mem_mb: 32000
     runtime: '8h'
-    gres: "gpu:1"
-    slurm_partition: "gpu_test"
+    slurm_extra: "'--gres=gpu:1'"
+    slurm_partition: "gpu"
   dechat_correct:
     nodes: 1
     tasks: 1

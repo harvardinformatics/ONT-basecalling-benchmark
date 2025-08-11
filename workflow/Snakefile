@@ -20,9 +20,9 @@ def get_reads(wildcards):
 #Fxn to handle fastq vs fasta as input
 def choose_path(wildcards):
     if wildcards.precorr == "herro":
-        passFile = f"../results/{wildcards.sample}_{wildcards.model}_{wildcards.precorr}.fasta"
+        passFile = f"../results/{wildcards.sample}_{wildcards.model}_herro/{wildcards.sample}_{wildcards.model}_{wildcards.precorr}.fasta"
     elif wildcards.precorr == "dechat":
-        passFile = f"../results/{wildcards.sample}_{wildcards.model}_{wildcards.precorr}.ec.fa"
+        passFile = f"../results/{wildcards.sample}_{wildcards.model}_dechat/{wildcards.sample}_{wildcards.model}_{wildcards.precorr}.ec.fa"
     else:
         passFile = f"../results/{wildcards.sample}_{wildcards.model}_{wildcards.precorr}.fastq"
     return passFile
@@ -52,7 +52,7 @@ rule herro_toPaf:
     input:
         "../results/{sample}_{model}_noCorr.fastq"
     output:
-        "../results/{sample}_{model}_herro.paf"
+        "../results/{sample}_{model}_herro/{sample}_{model}_herro.paf"
     log:
         "logs/herro/{sample}_{model}_toPaf.log"
     params:
@@ -62,10 +62,10 @@ rule herro_toPaf:
 
 rule herro_correct:
     input:
-        paf = "../results/{sample}_{model}_herro.paf",
+        paf = "../results/{sample}_{model}_herro/{sample}_{model}_herro.paf",
         reads = "../results/{sample}_{model}_noCorr.fastq"
     output:
-        "../results/{sample}_{model}_herro.fasta"
+        "../results/{sample}_{model}_herro/{sample}_{model}_herro.fasta"
     log:
         "logs/herro/{sample}_{model}_correct.log"
     params:
@@ -77,7 +77,7 @@ rule dechat_correct:
     input:
         "../results/{sample}_{model}_noCorr.fastq"
     output:
-        "../results/{sample}_{model}_dechat.ec.fa"
+        "../results/{sample}_{model}_dechat/{sample}_{model}_dechat.ec.fa"
     log:
         "logs/dechat/{sample}_{model}_correct.log"
     conda:
@@ -92,13 +92,25 @@ rule map_reads:
         query = choose_path,
         ref = config["ref_genome"]
     output:
-        "../results/{sample}_{model}_{precorr}.sorted.bam"
+        "../results/{sample}_{model}_{precorr}.sam"
     log:
         "logs/minimap/{sample}_{model}_{precorr}.log"
     conda:
         "envs/map_reads.yaml"
     shell:
-        "(minimap2 -ax map-ont -t {threads} {input.ref} {input.query} | samtools sort -@ {threads} --write-index > {output}) 2> {log}"
+        "(minimap2 -ax map-ont -t {threads} {input.ref} {input.query} > {output}) 2> {log}"
+
+rule sort_mappings:
+    input:
+        "../results/{sample}_{model}_{precorr}.sam"
+    output:
+        "../results/{sample}_{model}_{precorr}.sorted.bam"
+    log:
+        "logs/minmap/{sample}_{model}_{precorr}.sort.log"
+    conda:
+        "envs/samtools.yaml"
+    shell:
+        "(samtools sort -O bam -o {output} -@ {threads} --write-index {input}) 2> {log}"
 
 rule bam_errors:
     input: 
@@ -140,4 +152,4 @@ rule nanoplot:
     params:
         prefix = "../results/{sample}_{model}_noCorr_nanoplot"
     shell:
-        "(NanoPlot -t {threads} -o {params.prefix} {input}) 2> {log}"
+        "(NanoPlot -t {threads} -o {params.prefix} --fastq {input}) 2> {log}"
