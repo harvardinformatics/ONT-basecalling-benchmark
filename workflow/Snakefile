@@ -30,7 +30,7 @@ def choose_path(wildcards):
 #WIP: Change this to the relevant target files 
 rule all:
     input:
-        expand("../results/{sample}_{model}_{precorr}.hist", sample=samples, model=models, precorr=precorrs),
+    #    expand("../results/{sample}_{model}_{precorr}.hist", sample=samples, model=models, precorr=precorrs),
         expand("../results/{sample}_{model}_{precorr}_errorCatalog", sample=samples, model=models, precorr=precorrs),
         expand("../results/{sample}_{model}_noCorr_nanoplot", sample=samples, model=models)
 
@@ -84,8 +84,14 @@ rule dechat_correct:
         "envs/dechat.yaml"
     params:
         prefix = "../results/{sample}_{model}_dechat"
-    shell:
-        "(dechat -t {threads} -i {input} -o {params.prefix}) 2> {log}"
+        tempdir = temp("../tmp/{sample}_{model}")
+        logdir = "../workflow/logs/dechat/{sample}_{model}_correct.log"
+    shell: #need to isolate each dechat job to avoid overwriting files
+        """
+        mkdir -p {params.tempdir}
+        cd {params.tempdir}
+        (dechat -t {threads} -i {input} -o {params.prefix}) 2> {params.logdir}
+        """
 
 rule map_reads:
     input:
@@ -126,7 +132,7 @@ rule bam_errors:
     shell:
         "(catalogue_errors -t {threads} -o {params.prefix} {input}) 2> {log}"
 
-rule count_kmers:
+rule count_kmers: #Disabled for now
     input:
         choose_path
     output:
@@ -152,4 +158,4 @@ rule nanoplot:
     params:
         prefix = "../results/{sample}_{model}_noCorr_nanoplot"
     shell:
-        "(NanoPlot -t {threads} -o {params.prefix} --fastq {input}) 2> {log}"
+        "(NanoPlot -t {threads} -o {params.prefix} -p {params.prefix} --no_static --fastq {input}) 2> {log}"
