@@ -83,14 +83,15 @@ rule dechat_correct:
     conda:
         "envs/dechat.yaml"
     params:
-        prefix = "../results/{sample}_{model}_dechat"
-        tempdir = temp("../tmp/{sample}_{model}")
-        logdir = "../workflow/logs/dechat/{sample}_{model}_correct.log"
+        prefix = "{sample}_{model}_dechat",
+        tempdir = temp("../tmp_{sample}_{model}"),
+        tomove = "{sample}_{model}_dechat.ec.fa"
     shell: #need to isolate each dechat job to avoid overwriting files
         """
         mkdir -p {params.tempdir}
         cd {params.tempdir}
-        (dechat -t {threads} -i {input} -o {params.prefix}) 2> {params.logdir}
+        dechat -t {threads} -i {input} -o {params.prefix}
+        mv {params.tomove} {output}
         """
 
 rule map_reads:
@@ -104,7 +105,7 @@ rule map_reads:
     conda:
         "envs/map_reads.yaml"
     shell:
-        "(minimap2 -ax map-ont -t {threads} {input.ref} {input.query} > {output}) 2> {log}"
+        "(minimap2 -ax map-ont --MD -t {threads} {input.ref} {input.query} > {output}) 2> {log}"
 
 rule sort_mappings:
     input:
@@ -130,7 +131,7 @@ rule bam_errors:
     params:
         prefix = "../results/{sample}_{model}_{precorr}_errorCatalog"
     shell:
-        "(catalogue_errors -t {threads} -o {params.prefix} {input}) 2> {log}"
+        "(catalogue_errors count -t {threads} -o {params.prefix} {input}) 2> {log}"
 
 rule count_kmers: #Disabled for now
     input:
