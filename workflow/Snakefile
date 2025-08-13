@@ -85,12 +85,14 @@ rule dechat_correct:
     params:
         prefix = "{sample}_{model}_dechat",
         tempdir = temp("../tmp_{sample}_{model}"),
+        readscopy = "{sample}_{model}_noCorr.fastq",
         tomove = "{sample}_{model}_dechat.ec.fa"
     shell: #need to isolate each dechat job to avoid overwriting files
         """
         mkdir -p {params.tempdir}
+        cp {input} {params.tempdir}
         cd {params.tempdir}
-        dechat -t {threads} -i {input} -o {params.prefix}
+        dechat -t {threads} -i {params.readscopy} -o {params.prefix}
         mv {params.tomove} {output}
         """
 
@@ -113,7 +115,7 @@ rule sort_mappings:
     output:
         "../results/{sample}_{model}_{precorr}.sorted.bam"
     log:
-        "logs/minmap/{sample}_{model}_{precorr}.sort.log"
+        "logs/minimap/{sample}_{model}_{precorr}.sort.log"
     conda:
         "envs/samtools.yaml"
     shell:

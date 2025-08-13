@@ -3,4 +3,4 @@ channels:
   - defaults
   - conda-forge
 dependencies:
-  - nanoplot
+  - nanoplot=1.44.1
