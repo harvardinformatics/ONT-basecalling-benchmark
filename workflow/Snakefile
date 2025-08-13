@@ -22,7 +22,7 @@ def choose_path(wildcards):
     if wildcards.precorr == "herro":
         passFile = f"../results/{wildcards.sample}_{wildcards.model}_herro/{wildcards.sample}_{wildcards.model}_{wildcards.precorr}.fasta"
     elif wildcards.precorr == "dechat":
-        passFile = f"../results/{wildcards.sample}_{wildcards.model}_dechat/{wildcards.sample}_{wildcards.model}_{wildcards.precorr}.ec.fa"
+        passFile = f"../results/{wildcards.sample}_{wildcards.model}_{wildcards.precorr}.ec.fa"
     else:
         passFile = f"../results/{wildcards.sample}_{wildcards.model}_{wildcards.precorr}.fastq"
     return passFile
@@ -77,7 +77,7 @@ rule dechat_correct:
     input:
         "../results/{sample}_{model}_noCorr.fastq"
     output:
-        "../results/{sample}_{model}_dechat/{sample}_{model}_dechat.ec.fa"
+        "../results/{sample}_{model}_dechat.ec.fa"
     log:
         "logs/dechat/{sample}_{model}_correct.log"
     conda:
@@ -135,19 +135,21 @@ rule bam_errors:
     shell:
         "(catalogue_errors count -t {threads} -o {params.prefix} {input}) 2> {log}"
 
-rule count_kmers: #Disabled for now
+rule count_kmers:
     input:
         choose_path
     output:
         "../results/{sample}_{model}_{precorr}.hist"
     log:
-        "logs/kmerKAT/{sample}_{model}_{precorr}.log"
-    conda:
-        "envs/kat.yaml"
+        "logs/jellyfish/{sample}_{model}_{precorr}.log"
     params:
-        prefix = "../results/{sample}_{model}_{precorr}.hist"
+        prefix = "../results/{sample}_{model}_{precorr}.jf",
+        jellyfish = config["jellyfish_path"]
     shell:
-        "(kat hist -t {threads} -o {params.prefix} {input}) 2> {log}"
+        """
+        {params.jellyfish} count -m 27 -C -t {threads} -s 8G -o {params.prefix} {input}
+        {params.jellyfish} hist -t {threads} {params.prefix} > {output}
+        """
 
 rule nanoplot:
     input:
@@ -161,4 +163,4 @@ rule nanoplot:
     params:
         prefix = "../results/{sample}_{model}_noCorr_nanoplot"
     shell:
-        "(NanoPlot -t {threads} -o {params.prefix} -p {params.prefix} --no_static --fastq {input}) 2> {log}"
+        "(NanoPlot -t {threads} -o {params.prefix} --no_static --fastq {input}) 2> {log}"

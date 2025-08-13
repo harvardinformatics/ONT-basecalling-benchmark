@@ -10,3 +10,4 @@ precorrs: ["noCorr","herro","dechat"]
 ref_genome: "../testing/ref.fa"
 
 dorado_path: "../testing/dorado"
+jellyfish_path: "/n/holylfs05/LABS/informatics/Users/dkhost/jellyfish-2.3.1/bin/jellyfish"
