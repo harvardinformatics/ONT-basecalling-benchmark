@@ -30,7 +30,7 @@ def choose_path(wildcards):
 #WIP: Change this to the relevant target files 
 rule all:
     input:
-    #    expand("../results/{sample}_{model}_{precorr}.hist", sample=samples, model=models, precorr=precorrs),
+        expand("../results/{sample}_{model}_{precorr}.hist", sample=samples, model=models, precorr=precorrs),
         expand("../results/{sample}_{model}_{precorr}_errorCatalog", sample=samples, model=models, precorr=precorrs),
         expand("../results/{sample}_{model}_noCorr_nanoplot", sample=samples, model=models)
 
@@ -145,7 +145,7 @@ rule count_kmers: #Disabled for now
     conda:
         "envs/kat.yaml"
     params:
-        prefix = "{sample}_{model}_{precorr}"
+        prefix = "../results/{sample}_{model}_{precorr}.hist"
     shell:
         "(kat hist -t {threads} -o {params.prefix} {input}) 2> {log}"
 
