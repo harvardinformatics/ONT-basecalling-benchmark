@@ -32,7 +32,7 @@ rule all:
     input:
         expand("../results/{sample}_{model}_{precorr}.hist", sample=samples, model=models, precorr=precorrs),
         expand("../results/{sample}_{model}_{precorr}_errorCatalog", sample=samples, model=models, precorr=precorrs),
-        expand("../results/{sample}_{model}_noCorr_nanoplot", sample=samples, model=models)
+        expand("../results/{sample}_{model}_noCorr_nanoplotNanoStats.txt", sample=samples, model=models)
 
 
 rule basecall:
@@ -125,7 +125,7 @@ rule bam_errors:
     input: 
         "../results/{sample}_{model}_{precorr}.sorted.bam"
     output:
-        "../results/{sample}_{model}_{precorr}_errorCatalog" #check what kind output?
+        directory("../results/{sample}_{model}_{precorr}_errorCatalog") #check what kind output?
     log:
         "logs/bam_errors/{sample}_{model}_{precorr}.log"
     conda:
@@ -148,19 +148,20 @@ rule count_kmers:
     shell:
         """
         {params.jellyfish} count -m 27 -C -t {threads} -s 8G -o {params.prefix} {input}
-        {params.jellyfish} hist -t {threads} {params.prefix} > {output}
+        {params.jellyfish} histo -t {threads} {params.prefix} > {output}
         """
 
 rule nanoplot:
     input:
         "../results/{sample}_{model}_noCorr.fastq"
     output:
-        "../results/{sample}_{model}_noCorr_nanoplot"
+        "../results/{sample}_{model}_noCorr_nanoplotNanoStats.txt"
     log:
         "logs/nanoplot/{sample}_{model}_noCorr.log"
     conda:
         "envs/nanoplot.yaml"
     params:
-        prefix = "../results/{sample}_{model}_noCorr_nanoplot"
+        prefix = "{sample}_{model}_noCorr_nanoplot",
+        outdir = "../results/"
     shell:
-        "(NanoPlot -t {threads} -o {params.prefix} --no_static --fastq {input}) 2> {log}"
+        "(NanoPlot -t {threads} -o {params.outdir} -p {params.prefix} --no_static --fastq {input}) 2> {log}"
