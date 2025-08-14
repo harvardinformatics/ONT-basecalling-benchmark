@@ -31,7 +31,7 @@ def choose_path(wildcards):
 rule all:
     input:
         expand("../results/{sample}_{model}_{precorr}.hist", sample=samples, model=models, precorr=precorrs),
-        expand("../results/{sample}_{model}_{precorr}_errorCatalog", sample=samples, model=models, precorr=precorrs),
+        expand("../results/{sample}_{model}_{precorr}.bamstats.txt", sample=samples, model=models, precorr=precorrs),
         expand("../results/{sample}_{model}_noCorr_nanoplotNanoStats.txt", sample=samples, model=models)
 
 
