@@ -7,7 +7,7 @@ models: ["sup", "hac"]
 
 precorrs: ["noCorr","herro","dechat"]
 
-ref_genome: "../testing/ref.fa"
+ref_genome: "/n/netscratch/informatics/Lab/dkhost/basecalling_tests/dmel-all-chromosome-r6.64.fasta"
 
-dorado_path: "../testing/dorado"
+dorado_path: "/n/holylfs05/LABS/informatics/Users/dkhost/dorado-0.9.5-linux-x64-cuda-11.8/bin/dorado"
 jellyfish_path: "/n/holylfs05/LABS/informatics/Users/dkhost/jellyfish-2.3.1/bin/jellyfish"

@@ -21,33 +21,33 @@ set-resources:
     nodes: 1
     cpus_per_task: 1
     slurm_extra: "'--gres=gpu:1'"
-    mem_mb: 32000
-    runtime: '8h'
+    mem_mb: 64000
+    runtime: '1d'
     slurm_partition: "gpu"
   herro_toPaf:
     nodes: 1
     cpus_per_task: 16
     mem_mb: 32000
-    runtime: '8h'
+    runtime: '3d'
     slurm_partition: "holy-cow"
   herro_correct:
     nodes: 1
     cpus_per_task: 8
-    mem_mb: 32000
-    runtime: '8h'
+    mem_mb: 64000
+    runtime: '3d'
     slurm_extra: "'--gres=gpu:1'"
     slurm_partition: "gpu"
   dechat_correct:
     nodes: 1
     cpus_per_task: 8
     mem_mb: 64000
-    runtime: '8h'
+    runtime: '3d'
     slurm_partition: "holy-cow"
   map_reads:
     nodes: 1
     cpus_per_task: 16
     mem_mb: 64000
-    runtime: '8h'
+    runtime: '1d'
     slurm_partition: "holy-cow"
   sort_mappings:
     nodes: 1
@@ -65,12 +65,12 @@ set-resources:
     nodes: 1
     cpus_per_task: 4
     mem_mb: 44000
-    runtime: 720
+    runtime: '8h'
     slurm_partition: "shared"
   nanoplot:
     nodes: 1
     cpus_per_task: 4
     mem_mb: 16000
-    runtime: 720
+    runtime: '8h'
     slurm_partition: "shared"
 
