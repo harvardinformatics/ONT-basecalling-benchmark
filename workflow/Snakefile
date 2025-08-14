@@ -121,19 +121,33 @@ rule sort_mappings:
     shell:
         "(samtools sort -O bam -o {output} -@ {threads} --write-index {input}) 2> {log}"
 
+# rule bam_errors:
+#     input: 
+#         "../results/{sample}_{model}_{precorr}.sorted.bam"
+#     output:
+#         directory("../results/{sample}_{model}_{precorr}_errorCatalog") #check what kind output?
+#     log:
+#         "logs/bam_errors/{sample}_{model}_{precorr}.log"
+#     conda:
+#         "envs/pomoxis.yaml"
+#     params:
+#         prefix = "../results/{sample}_{model}_{precorr}_errorCatalog"
+#     shell:
+#         "(catalogue_errors count -t {threads} -o {params.prefix} {input}) 2> {log}"
+
 rule bam_errors:
-    input: 
+    input:
         "../results/{sample}_{model}_{precorr}.sorted.bam"
     output:
-        directory("../results/{sample}_{model}_{precorr}_errorCatalog") #check what kind output?
+        "../results/{sample}_{model}_{precorr}.bamstats.txt"
     log:
-        "logs/bam_errors/{sample}_{model}_{precorr}.log"
+        "logs/samtools_stats/{sample}_{model}_{precorr}.log"
     conda:
-        "envs/pomoxis.yaml"
+        "envs/samtools.yaml"
     params:
-        prefix = "../results/{sample}_{model}_{precorr}_errorCatalog"
+        ref = config["ref_genome"]
     shell:
-        "(catalogue_errors count -t {threads} -o {params.prefix} {input}) 2> {log}"
+        "(samtools stats -@ {threads} --reference {params.ref} {input} > {output}) 2> {log}"
 
 rule count_kmers:
     input:
