@@ -27,7 +27,7 @@ set-resources:
   herro_toPaf:
     nodes: 1
     cpus_per_task: 16
-    mem_mb: 32000
+    mem_mb: 64000
     runtime: '3d'
     slurm_partition: "holy-cow"
   herro_correct:
